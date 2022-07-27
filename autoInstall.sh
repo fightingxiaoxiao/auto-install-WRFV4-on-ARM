@@ -986,15 +986,43 @@ getWPS() {
 
         sed -i 's/standard_wrf_dirs="WRF WRF-4.0.3 WRF-4.0.2 WRF-4.0.1 WRF-4.0 WRFV3 WRF-4.1.2"/standard_wrf_dirs="WRF WRF-4.2 WRF-4.3 WRF-4.0.3 WRF-4.0.2 WRF-4.0.1 WRF-4.0 WRFV3 WRF-4.1.2"/g' ./configure
 
+        
+        echo "
+########################################################################################################################
+#ARCH    Linux aarch64, gfortran   # serial serial_NO_GRIB2 dmpar dmpar_NO_GRIB2
+#
+COMPRESSION_LIBS    = CONFIGURE_COMP_L
+COMPRESSION_INC     = CONFIGURE_COMP_I
+FDEFS               = CONFIGURE_FDEFS
+SFC                 = gfortran
+SCC                 = gcc
+DM_FC               = mpif90
+DM_CC               = mpicc
+FC                  = CONFIGURE_FC 
+CC                  = CONFIGURE_CC
+LD                  = \$(FC)
+FFLAGS              = -ffree-form -O -fconvert=big-endian -frecord-marker=4
+F77FLAGS            = -ffixed-form -O -fconvert=big-endian -frecord-marker=4
+FCSUFFIX            = 
+FNGFLAGS            = \$(FFLAGS)
+LDFLAGS             =
+CFLAGS              =
+CPP                 = /usr/bin/cpp -P -traditional
+CPPFLAGS            = -D_UNDERSCORE -DBYTESWAP -DLINUX -DIO_NETCDF -DBIT32 -DNO_SIGNAL CONFIGURE_MPI
+RANLIB              = ranlib
+" >> ./arch/configure.defaults
+        
+
+# ICC的配置并不生效
         if [ "$CC_VERSION" == "gcc" ];then
             echo " ============================================================== "
-            echo -e "\nConfigure WPS: 1. Linux x86_64,gfortran (serial)"
-            echo '1' | ./configure &>$LOG_DIR/$1.config.log
+            echo -e "\nConfigure WPS: 1. Linux aarch64, gfortran (serial)"
+            echo '1' | ./configure &>$LOG_DIR/$1.config.logs
             echo " ============================================================== "
             sed -i 's/-lnetcdff -lnetcdf/-lnetcdff -lnetcdf -lgomp/g' ./configure.wps
         elif [ "$CC_VERSION" == "icc" ];then
             echo " ============================================================== "
-            echo -e "\nConfigure WPS: 19. Linux x86_64, Intel compiler (dmpar)"
+            echo -e "\nConfigure WPS: 19. Linux aarch64, Intel compiler (dmpar)"
             echo '19' | ./configure &>$LOG_DIR/$1.config.log
             echo " ============================================================== "
             sed -i 's/-lnetcdff -lnetcdf/-lnetcdff -lnetcdf -lgomp -lpthread -liomp5/g' ./configure.wps
